@@ -1,9 +1,12 @@
+// Make walls global so both files can access them
+window.walls = [];
+
 let player = document.getElementById("player");
 let playerPos = { top: 200, left: 200 };
 let speed = 5;
 let keys = {};
-let walls = [];
 
+// Track key presses
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
@@ -11,21 +14,22 @@ function gameLoop() {
     let newTop = playerPos.top;
     let newLeft = playerPos.left;
 
-    if(keys["ArrowUp"]||keys["w"]) newTop -= speed;
-    if(keys["ArrowDown"]||keys["s"]) newTop += speed;
-    if(keys["ArrowLeft"]||keys["a"]) newLeft -= speed;
-    if(keys["ArrowRight"]||keys["d"]) newLeft += speed;
+    if(keys["ArrowUp"] || keys["w"]) newTop -= speed;
+    if(keys["ArrowDown"] || keys["s"]) newTop += speed;
+    if(keys["ArrowLeft"] || keys["a"]) newLeft -= speed;
+    if(keys["ArrowRight"] || keys["d"]) newLeft += speed;
 
-    // clamp inside screen
-    newTop = Math.max(0, Math.min(window.innerHeight-40, newTop));
-    newLeft = Math.max(0, Math.min(window.innerWidth-40, newLeft));
+    // Clamp inside screen
+    newTop = Math.max(0, Math.min(window.innerHeight - 40, newTop));
+    newLeft = Math.max(0, Math.min(window.innerWidth - 40, newLeft));
 
-    // collision with walls
+    // Collision with walls
     let collided = false;
-    for(let wall of walls){
+    for(let wall of window.walls){
         let wRect = wall.getBoundingClientRect();
         let pRect = {top:newTop, left:newLeft, bottom:newTop+40, right:newLeft+40};
-        if(pRect.right > wRect.left && pRect.left < wRect.right && pRect.bottom > wRect.top && pRect.top < wRect.bottom){
+        if(pRect.right > wRect.left && pRect.left < wRect.right &&
+           pRect.bottom > wRect.top && pRect.top < wRect.bottom){
             collided = true;
             break;
         }

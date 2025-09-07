@@ -1,7 +1,7 @@
 let money = 10;
 let soldiers = 0;
 
-// UI
+// Update stats display
 function updateUI() {
     document.getElementById("money").textContent = money;
     document.getElementById("soldiers").textContent = soldiers;
@@ -17,27 +17,27 @@ function createSoldierButton(top, left) {
     document.getElementById("game").appendChild(btn);
 
     btn.addEventListener("click", () => {
-        if(money >= 10) {
+        if(money >= 10){
             money -= 10;
             soldiers++;
             updateUI();
             btn.style.display = "none";
 
-            // create soldier
+            // Create soldier
             let soldier = document.createElement("div");
             soldier.classList.add("soldier");
             soldier.style.top = (top + 40) + "px";
             soldier.style.left = (left + 20) + "px";
             document.getElementById("game").appendChild(soldier);
 
-            // create red target for this soldier
+            // Create unique red target for this soldier
             let target = document.createElement("div");
             target.classList.add("target");
             target.style.top = soldier.style.top;
-            target.style.left = "50px"; // fixed left position
+            target.style.left = "50px";
             document.getElementById("game").appendChild(target);
 
-            // passive income bullets aimed at this target
+            // Passive income bullets aimed at this target
             setInterval(() => {
                 money += 1;
                 updateUI();
@@ -49,10 +49,12 @@ function createSoldierButton(top, left) {
                 document.getElementById("game").appendChild(bullet);
 
                 let bulletX = parseInt(bullet.style.left);
+                let targetLeft = parseInt(target.style.left);
+
                 let moveBullet = setInterval(() => {
                     bulletX -= 5;
                     bullet.style.left = bulletX + "px";
-                    if (bulletX < target.getBoundingClientRect().left) {
+                    if(bulletX < targetLeft){
                         bullet.remove();
                         clearInterval(moveBullet);
                     }
@@ -77,7 +79,7 @@ function createWallButton(top, left, width, height) {
     document.getElementById("game").appendChild(btn);
 
     btn.addEventListener("click", () => {
-        if (money >= 30) {
+        if(money >= 30){
             money -= 30;
             updateUI();
             btn.style.display = "none";
@@ -90,10 +92,8 @@ function createWallButton(top, left, width, height) {
             wall.style.height = height + "px";
             document.getElementById("game").appendChild(wall);
 
-            // add to player.js walls for collision
-            if (window.walls) {
-                walls.push(wall);
-            }
+            // Add wall to global collision array
+            window.walls.push(wall);
         }
     });
 }
@@ -103,7 +103,7 @@ createWallButton(50, 50, 600, 10);     // top wall
 createWallButton(440, 50, 600, 10);    // bottom wall
 createWallButton(50, 50, 10, 400);     // left wall
 createWallButton(50, 640, 10, 150);    // right wall top
-createWallButton(300, 640, 10, 150);   // right wall bottom (leaves middle exit)
+createWallButton(300, 640, 10, 150);   // right wall bottom (middle exit)
 
-// Initialize UI
+// Initialize stats
 updateUI();

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WW2 Tycoon 2D</title>
+  <style>
+    body {
+      margin: 0;
+      background: #2e2e2e;
+      overflow: hidden;
+    }
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #3d3d3d;
+    }
+    #player {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: green;
+      top: 200px;
+      left: 200px;
+    }
+    .button {
+      position: absolute;
+      width: 100px;
+      height: 30px;
+      background: red;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      line-height: 30px;
+      border-radius: 5px;
+    }
+    #stats {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="player"></div>
+
+    <!-- Upgrade buttons -->
+    <div id="btn-soldier" class="button" style="top:100px;left:100px;">Barracks $10</div>
+    <div id="btn-tank" class="button" style="top:250px;left:400px;">Tank Factory $50</div>
+    <div id="btn-air" class="button" style="top:400px;left:200px;">Airfield $200</div>
+
+    <!-- Stats -->
+    <div id="stats">
+      Money: $<span id="money">0</span> | 
+      Soldiers: <span id="soldiers">0</span> | 
+      Tanks: <span id="tanks">0</span> | 
+      Planes: <span id="planes">0</span>
+    </div>
+  </div>
+
+  <script>
+    // Game state
+    let money = 0;
+    let soldiers = 0;
+    let tanks = 0;
+    let planes = 0;
+
+    let player = document.getElementById("player");
+    let speed = 5;
+    let keys = {};
+
+    // Load save from localStorage
+    if(localStorage.getItem("ww2Save")){
+      let save = JSON.parse(localStorage.getItem("ww2Save"));
+      money = save.money || 0;
+      soldiers = save.soldiers || 0;
+      tanks = save.tanks || 0;
+      planes = save.planes || 0;
+      updateUI();
+    }
+
+    // Movement controls
+    document.addEventListener("keydown", e => keys[e.key] = true);
+    document.addEventListener("keyup", e => keys[e.key] = false);
+
+    function gameLoop(){
+      let top = parseInt(player.style.top);
+      let left = parseInt(player.style.left);
+
+      if(keys["ArrowUp"] || keys["w"]) player.style.top = (top - speed) + "px";
+      if(keys["ArrowDown"] || keys["s"]) player.style.top = (top + speed) + "px";
+      if(keys["ArrowLeft"] || keys["a"]) player.style.left = (left - speed) + "px";
+      if(keys["ArrowRight"] || keys["d"]) player.style.left = (left + speed) + "px";
+
+      checkCollision();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function checkCollision(){
+      let p = player.getBoundingClientRect();
+
+      buyOnTouch(p, "btn-soldier", 10, () => soldiers++);
+      buyOnTouch(p, "btn-tank", 50, () => tanks++);
+      buyOnTouch(p, "btn-air", 200, () => planes++);
+
+      updateUI();
+    }
+
+    function buyOnTouch(p, btnId, cost, onBuy){
+      let b = document.getElementById(btnId).getBoundingClientRect();
+      if(p.left < b.right && p.right > b.left && p.top < b.bottom && p.bottom > b.top){
+        if(money >= cost){
+          money -= cost;
+          onBuy();
+          saveGame();
+        }
+      }
+    }
+
+    function updateUI(){
+      document.getElementById("money").textContent = money;
+      document.getElementById("soldiers").textContent = soldiers;
+      document.getElementById("tanks").textContent = tanks;
+      document.getElementById("planes").textContent = planes;
+    }
+
+    function saveGame(){
+      let save = {
+        money: money,
+        soldiers: soldiers,
+        tanks: tanks,
+        planes: planes
+      };
+      localStorage.setItem("ww2Save", JSON.stringify(save));
+    }
+
+    // Passive income loop
+    setInterval(() => {
+      money += soldiers * 1;
+      money += tanks * 5;
+      money += planes * 20;
+      updateUI();
+      saveGame();
+    }, 1000);
+
+    gameLoop();
+  </script>
+</body>
+</html>

@@ -1,164 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WW2 Tycoon 2D</title>
-  <style>
-    body {
-      margin: 0;
-      background: #2e2e2e;
-      overflow: hidden;
-    }
-    #game {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background: #3d3d3d;
-    }
-    #player {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      background: green;
-      top: 200px;
-      left: 200px;
-    }
-    .button {
-      position: absolute;
-      width: 100px;
-      height: 30px;
-      background: red;
-      text-align: center;
-      color: white;
-      font-size: 12px;
-      line-height: 30px;
-      border-radius: 5px;
-    }
-    #stats {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: white;
-      font-family: Arial, sans-serif;
-      font-size: 16px;
-      background: rgba(0,0,0,0.5);
-      padding: 5px 10px;
-      border-radius: 5px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>WW2 Tycoon 2D</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #3cb043; /* green grass */
+  }
+  #game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+  #foundation {
+    position: absolute;
+    width: 600px;
+    height: 400px;
+    background: #d3d3d3; /* light grey foundation */
+    top: 50px;
+    left: 50px;
+    border: 2px solid #888;
+  }
+  #player {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: green;
+    top: 200px;
+    left: 200px;
+    z-index: 10;
+  }
+  .button {
+    position: absolute;
+    width: 80px;
+    height: 30px;
+    background: red;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .wall-button {
+    position: absolute;
+    width: 50px;
+    height: 30px;
+    background: #555;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .soldier {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: black;
+    border-radius: 3px;
+  }
+  .bullet {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: yellow;
+    border-radius: 50%;
+  }
+  .wall {
+    position: absolute;
+    background: #555;
+  }
+  #stats {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    color: white;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+</style>
 </head>
 <body>
-  <div id="game">
-    <div id="player"></div>
+<div id="game">
+  <div id="foundation"></div>
+  <div id="player"></div>
 
-    <!-- Upgrade buttons -->
-    <div id="btn-soldier" class="button" style="top:100px;left:100px;">Barracks $10</div>
-    <div id="btn-tank" class="button" style="top:250px;left:400px;">Tank Factory $50</div>
-    <div id="btn-air" class="button" style="top:400px;left:200px;">Airfield $200</div>
+  <!-- Red buttons for soldiers -->
+  <div class="button" id="btn-soldier1" style="top:80px; left:100px;">$10</div>
+  <div class="button" id="btn-soldier2" style="top:80px; left:200px;">$10</div>
+  <div class="button" id="btn-soldier3" style="top:80px; left:300px;">$10</div>
 
-    <!-- Stats -->
-    <div id="stats">
-      Money: $<span id="money">0</span> | 
-      Soldiers: <span id="soldiers">0</span> | 
-      Tanks: <span id="tanks">0</span> | 
-      Planes: <span id="planes">0</span>
-    </div>
-  </div>
+  <!-- Wall buttons -->
+  <div class="wall-button" id="btn-wall-top" style="top:0; left:50px;">Top Wall</div>
+  <div class="wall-button" id="btn-wall-bottom" style="top:450px; left:50px;">Bottom Wall</div>
+  <div class="wall-button" id="btn-wall-left" style="top:50px; left:0;">Left Wall</div>
+  <div class="wall-button" id="btn-wall-right" style="top:50px; left:650px;">Right Wall</div>
 
-  <script>
-    // Game state
-    let money = 10; // Start with $10
-    let soldiers = 0;
-    let tanks = 0;
-    let planes = 0;
+  <div id="stats">Money: $<span id="money">10</span> | Soldiers: <span id="soldiers">0</span></div>
+</div>
 
-    let player = document.getElementById("player");
-    let speed = 5;
-    let keys = {};
+<script>
+let money = 10;
+let soldiers = 0;
+let player = document.getElementById("player");
+let playerPos = { top: 200, left: 200 };
+let speed = 5;
+let keys = {};
+let soldierCount = 0;
 
-    // Player numeric position
-    let playerPos = { top: 200, left: 200 };
+// movement controls
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
 
-    // Load save if available
-    if(localStorage.getItem("ww2Save")){
-      let save = JSON.parse(localStorage.getItem("ww2Save"));
-      money = save.money || money; // keep $10 if no save
-      soldiers = save.soldiers || 0;
-      tanks = save.tanks || 0;
-      planes = save.planes || 0;
-    }
+function gameLoop(){
+  if(keys["ArrowUp"] || keys["w"]) playerPos.top -= speed;
+  if(keys["ArrowDown"] || keys["s"]) playerPos.top += speed;
+  if(keys["ArrowLeft"] || keys["a"]) playerPos.left -= speed;
+  if(keys["ArrowRight"] || keys["d"]) playerPos.left += speed;
 
-    // Controls
-    document.addEventListener("keydown", e => keys[e.key] = true);
-    document.addEventListener("keyup", e => keys[e.key] = false);
+  // Clamp player inside screen
+  playerPos.top = Math.max(0, Math.min(window.innerHeight - 40, playerPos.top));
+  playerPos.left = Math.max(0, Math.min(window.innerWidth - 40, playerPos.left));
 
-    function gameLoop(){
-      // Update player position
-      if(keys["ArrowUp"] || keys["w"]) playerPos.top -= speed;
-      if(keys["ArrowDown"] || keys["s"]) playerPos.top += speed;
-      if(keys["ArrowLeft"] || keys["a"]) playerPos.left -= speed;
-      if(keys["ArrowRight"] || keys["d"]) playerPos.left += speed;
+  player.style.top = playerPos.top + "px";
+  player.style.left = playerPos.left + "px";
 
-      // Clamp inside game area
-      playerPos.top = Math.max(0, Math.min(window.innerHeight - 40, playerPos.top));
-      playerPos.left = Math.max(0, Math.min(window.innerWidth - 40, playerPos.left));
+  requestAnimationFrame(gameLoop);
+}
 
-      // Apply position
-      player.style.top = playerPos.top + "px";
-      player.style.left = playerPos.left + "px";
+gameLoop();
 
-      checkCollision();
-      requestAnimationFrame(gameLoop);
-    }
-
-    function checkCollision(){
-      let p = player.getBoundingClientRect();
-
-      buyOnTouch(p, "btn-soldier", 10, () => soldiers++);
-      buyOnTouch(p, "btn-tank", 50, () => tanks++);
-      buyOnTouch(p, "btn-air", 200, () => planes++);
-
+// Buy soldier function
+function buySoldier(buttonId, x, y){
+  let btn = document.getElementById(buttonId);
+  btn.addEventListener("click", () => {
+    if(money >= 10){
+      money -= 10;
+      soldiers++;
+      soldierCount++;
       updateUI();
-    }
+      btn.style.display = "none"; // remove button
 
-    function buyOnTouch(p, btnId, cost, onBuy){
-      let b = document.getElementById(btnId).getBoundingClientRect();
-      if(p.left < b.right && p.right > b.left && p.top < b.bottom && p.bottom > b.top){
-        if(money >= cost){
-          money -= cost;
-          onBuy();
-          saveGame();
-        }
-      }
-    }
+      // create soldier
+      let soldier = document.createElement("div");
+      soldier.classList.add("soldier");
+      soldier.style.top = y + "px";
+      soldier.style.left = x + "px";
+      document.getElementById("game").appendChild(soldier);
 
-    function updateUI(){
-      document.getElementById("money").textContent = money;
-      document.getElementById("soldiers").textContent = soldiers;
-      document.getElementById("tanks").textContent = tanks;
-      document.getElementById("planes").textContent = planes;
+      // passive income bullets
+      setInterval(() => {
+        money += 1; // each soldier gives $1/sec
+        updateUI();
+        // create bullet animation
+        let bullet = document.createElement("div");
+        bullet.classList.add("bullet");
+        bullet.style.top = (y + 10) + "px";
+        bullet.style.left = (x + 20) + "px";
+        document.getElementById("game").appendChild(bullet);
+        setTimeout(() => bullet.remove(), 500);
+      }, 1000);
     }
+  });
+}
 
-    function saveGame(){
-      let save = {
-        money: money,
-        soldiers: soldiers,
-        tanks: tanks,
-        planes: planes
-      };
-      localStorage.setItem("ww2Save", JSON.stringify(save));
-    }
+// Add all soldier buttons
+buySoldier("btn-soldier1", 120, 120);
+buySoldier("btn-soldier2", 220, 120);
+buySoldier("btn-soldier3", 320, 120);
 
-    // Passive income
-    setInterval(() => {
-      money += soldiers * 1;
-      money += tanks * 5;
-      money += planes * 20;
+// Wall creation
+function addWall(buttonId, top, left, width, height){
+  let btn = document.getElementById(buttonId);
+  btn.addEventListener("click", () => {
+    if(money >= 5){
+      money -=5;
       updateUI();
-      saveGame();
-    }, 1000);
+      let wall = document.createElement("div");
+      wall.classList.add("wall");
+      wall.style.top = top + "px";
+      wall.style.left = left + "px";
+      wall.style.width = width + "px";
+      wall.style.height = height + "px";
+      document.getElementById("game").appendChild(wall);
+    }
+  });
+}
 
-    gameLoop();
-  </script>
+// top wall with hole
+addWall("btn-wall-top", 50, 50, 200, 10); // part 1
+addWall("btn-wall-top", 50, 260, 140, 10); // part 2 leaving hole between 250-260px
+
+// bottom wall
+addWall("btn-wall-bottom", 440, 50, 600, 10);
+// left wall
+addWall("btn-wall-left", 50, 50, 10, 400);
+// right wall
+addWall("btn-wall-right", 50, 640, 10, 400);
+
+function updateUI(){
+  document.getElementById("money").textContent = money;
+  document.getElementById("soldiers").textContent = soldiers;
+}
+</script>
 </body>
 </html>

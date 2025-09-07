@@ -1,11 +1,112 @@
-body { margin:0; overflow:hidden; background:#3cb043; }
-#game { position:relative; width:100vw; height:100vh; }
-#foundation { position:absolute; width:600px; height:400px; background:#d3d3d3; top:50px; left:50px; border:2px solid #888; }
-#player { position:absolute; width:40px; height:40px; background:green; top:200px; left:200px; z-index:10; }
-#target { position:absolute; width:20px; height:20px; background:red; top:150px; left:50px; border-radius:50%; }
-#stats { position:absolute; top:10px; left:10px; font-family:Arial; font-size:16px; color:white; background:rgba(0,0,0,0.5); padding:5px 10px; border-radius:5px; }
-.button { position:absolute; width:80px; height:30px; background:red; color:white; text-align:center; line-height:30px; border-radius:5px; cursor:pointer; }
-.wall-button { position:absolute; width:80px; height:30px; background:#555; color:white; text-align:center; line-height:30px; border-radius:5px; cursor:pointer; }
-.soldier { position:absolute; width:20px; height:20px; background:black; border-radius:3px; }
-.bullet { position:absolute; width:5px; height:5px; background:yellow; border-radius:50%; }
-.wall { position:absolute; background:#555; }
+/* General page setup */
+body { 
+  margin: 0; 
+  overflow: hidden; 
+  background: #3cb043; /* green grass */ 
+}
+
+#game { 
+  position: relative; 
+  width: 100vw; 
+  height: 100vh; 
+}
+
+/* Foundation */
+#foundation { 
+  position: absolute; 
+  width: 600px; 
+  height: 400px; 
+  background: #d3d3d3; /* light grey foundation */ 
+  top: 50px; 
+  left: 50px; 
+  border: 2px solid #888; 
+}
+
+/* Player */
+#player { 
+  position: absolute; 
+  width: 40px; 
+  height: 40px; 
+  background: green; 
+  top: 200px; 
+  left: 200px; 
+  z-index: 10; 
+}
+
+/* Red targets */
+.target { 
+  position: absolute; 
+  width: 20px; 
+  height: 20px; 
+  background: red; 
+  border-radius: 50%; 
+  border: 2px solid #880000; /* dark outline to stand out */ 
+  z-index: 5; 
+}
+
+/* Stats panel */
+#stats { 
+  position: absolute; 
+  top: 10px; 
+  left: 10px; 
+  font-family: Arial, sans-serif; 
+  font-size: 16px; 
+  color: white; 
+  background: rgba(0,0,0,0.5); 
+  padding: 5px 10px; 
+  border-radius: 5px; 
+}
+
+/* Buttons */
+.button { 
+  position: absolute; 
+  width: 80px; 
+  height: 30px; 
+  background: red; 
+  color: white; 
+  text-align: center; 
+  line-height: 30px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold;
+}
+
+.wall-button { 
+  position: absolute; 
+  width: 80px; 
+  height: 30px; 
+  background: #555; 
+  color: white; 
+  text-align: center; 
+  line-height: 30px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold;
+}
+
+/* Soldiers */
+.soldier { 
+  position: absolute; 
+  width: 20px; 
+  height: 20px; 
+  background: black; 
+  border-radius: 3px; 
+  z-index: 6; 
+}
+
+/* Bullets */
+.bullet { 
+  position: absolute; 
+  width: 5px; 
+  height: 5px; 
+  background: yellow; 
+  border-radius: 50%; 
+  z-index: 7; 
+}
+
+/* Walls */
+.wall { 
+  position: absolute; 
+  background: #555; 
+  z-index: 8; 
+}

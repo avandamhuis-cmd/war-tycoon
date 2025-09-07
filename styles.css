@@ -1,8 +1,7 @@
-/* General page setup */
 body { 
   margin: 0; 
   overflow: hidden; 
-  background: #3cb043; /* green grass */ 
+  background: #3cb043; 
 }
 
 #game { 
@@ -11,18 +10,16 @@ body {
   height: 100vh; 
 }
 
-/* Foundation */
 #foundation { 
   position: absolute; 
   width: 600px; 
   height: 400px; 
-  background: #d3d3d3; /* light grey foundation */ 
+  background: #d3d3d3; 
   top: 50px; 
   left: 50px; 
   border: 2px solid #888; 
 }
 
-/* Player */
 #player { 
   position: absolute; 
   width: 40px; 
@@ -33,18 +30,16 @@ body {
   z-index: 10; 
 }
 
-/* Red targets */
 .target { 
   position: absolute; 
   width: 20px; 
   height: 20px; 
   background: red; 
   border-radius: 50%; 
-  border: 2px solid #880000; /* dark outline to stand out */ 
+  border: 2px solid #880000; 
   z-index: 5; 
 }
 
-/* Stats panel */
 #stats { 
   position: absolute; 
   top: 10px; 
@@ -57,12 +52,10 @@ body {
   border-radius: 5px; 
 }
 
-/* Buttons */
-.button { 
+.button, .wall-button { 
   position: absolute; 
   width: 80px; 
   height: 30px; 
-  background: red; 
   color: white; 
   text-align: center; 
   line-height: 30px; 
@@ -71,20 +64,9 @@ body {
   font-weight: bold;
 }
 
-.wall-button { 
-  position: absolute; 
-  width: 80px; 
-  height: 30px; 
-  background: #555; 
-  color: white; 
-  text-align: center; 
-  line-height: 30px; 
-  border-radius: 5px; 
-  cursor: pointer; 
-  font-weight: bold;
-}
+.button { background: red; }
+.wall-button { background: #555; }
 
-/* Soldiers */
 .soldier { 
   position: absolute; 
   width: 20px; 
@@ -94,7 +76,6 @@ body {
   z-index: 6; 
 }
 
-/* Bullets */
 .bullet { 
   position: absolute; 
   width: 5px; 
@@ -104,7 +85,6 @@ body {
   z-index: 7; 
 }
 
-/* Walls */
 .wall { 
   position: absolute; 
   background: #555; 

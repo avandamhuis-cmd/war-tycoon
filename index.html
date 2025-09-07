@@ -67,7 +67,7 @@
 
   <script>
     // Game state
-    let money = 0;
+    let money = 10; // Start with $10
     let soldiers = 0;
     let tanks = 0;
     let planes = 0;
@@ -76,24 +76,24 @@
     let speed = 5;
     let keys = {};
 
-    // Initialize numeric position
+    // Player numeric position
     let playerPos = { top: 200, left: 200 };
 
-    // Load save from localStorage
+    // Load save if available
     if(localStorage.getItem("ww2Save")){
       let save = JSON.parse(localStorage.getItem("ww2Save"));
-      money = save.money || 0;
+      money = save.money || money; // keep $10 if no save
       soldiers = save.soldiers || 0;
       tanks = save.tanks || 0;
       planes = save.planes || 0;
     }
 
-    // Movement controls
+    // Controls
     document.addEventListener("keydown", e => keys[e.key] = true);
     document.addEventListener("keyup", e => keys[e.key] = false);
 
     function gameLoop(){
-      // Update position
+      // Update player position
       if(keys["ArrowUp"] || keys["w"]) playerPos.top -= speed;
       if(keys["ArrowDown"] || keys["s"]) playerPos.top += speed;
       if(keys["ArrowLeft"] || keys["a"]) playerPos.left -= speed;
@@ -103,7 +103,7 @@
       playerPos.top = Math.max(0, Math.min(window.innerHeight - 40, playerPos.top));
       playerPos.left = Math.max(0, Math.min(window.innerWidth - 40, playerPos.left));
 
-      // Apply position to DOM
+      // Apply position
       player.style.top = playerPos.top + "px";
       player.style.left = playerPos.left + "px";
 
@@ -149,7 +149,7 @@
       localStorage.setItem("ww2Save", JSON.stringify(save));
     }
 
-    // Passive income loop
+    // Passive income
     setInterval(() => {
       money += soldiers * 1;
       money += tanks * 5;

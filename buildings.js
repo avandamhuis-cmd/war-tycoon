@@ -1,5 +1,6 @@
 let money = 10;
 let soldiers = 0;
+const soldierSpacing = 30; // vertical spacing for multiple soldiers per button
 
 // Update stats display
 function updateUI() {
@@ -7,8 +8,10 @@ function updateUI() {
     document.getElementById("soldiers").textContent = soldiers;
 }
 
-// Soldier buttons
-function createSoldierButton(top, left) {
+// Track number of soldiers bought per button to position vertically
+const soldierCounters = [0, 0, 0];
+
+function createSoldierButton(top, left, buttonIndex) {
     let btn = document.createElement("div");
     btn.classList.add("button");
     btn.style.top = top + "px";
@@ -23,17 +26,21 @@ function createSoldierButton(top, left) {
             updateUI();
             btn.style.display = "none";
 
+            // Determine vertical position
+            const offset = soldierCounters[buttonIndex] * soldierSpacing;
+            soldierCounters[buttonIndex]++;
+
             // Create soldier
             let soldier = document.createElement("div");
             soldier.classList.add("soldier");
-            soldier.style.top = (top + 40) + "px";
+            soldier.style.top = (top + 40 + offset) + "px";
             soldier.style.left = (left + 20) + "px";
             document.getElementById("game").appendChild(soldier);
 
-            // Create unique red target for this soldier
+            // Create red target for this soldier, aligned with soldier vertically
             let target = document.createElement("div");
             target.classList.add("target");
-            target.style.top = soldier.style.top;
+            target.style.top = parseInt(soldier.style.top) + 5 + "px"; // center target
             target.style.left = "50px";
             document.getElementById("game").appendChild(target);
 
@@ -44,16 +51,18 @@ function createSoldierButton(top, left) {
 
                 let bullet = document.createElement("div");
                 bullet.classList.add("bullet");
-                bullet.style.top = parseInt(soldier.style.top) + 7 + "px";
+                bullet.style.top = parseInt(soldier.style.top) + 10 + "px"; // fire from soldier center
                 bullet.style.left = parseInt(soldier.style.left) - 5 + "px";
                 document.getElementById("game").appendChild(bullet);
 
                 let bulletX = parseInt(bullet.style.left);
                 let targetLeft = parseInt(target.style.left);
+                let targetTop = parseInt(target.style.top) + 7; // aim center of target
 
                 let moveBullet = setInterval(() => {
                     bulletX -= 5;
                     bullet.style.left = bulletX + "px";
+                    bullet.style.top = targetTop + "px"; // keep bullet aligned vertically
                     if(bulletX < targetLeft){
                         bullet.remove();
                         clearInterval(moveBullet);
@@ -64,12 +73,12 @@ function createSoldierButton(top, left) {
     });
 }
 
-// Create 3 soldier buttons
-createSoldierButton(80, 100);
-createSoldierButton(80, 200);
-createSoldierButton(80, 300);
+// Create 3 soldier buttons with indices
+createSoldierButton(80, 100, 0);
+createSoldierButton(80, 200, 1);
+createSoldierButton(80, 300, 2);
 
-// Wall buttons
+// Wall buttons remain the same
 function createWallButton(top, left, width, height) {
     let btn = document.createElement("div");
     btn.classList.add("wall-button");
@@ -92,18 +101,16 @@ function createWallButton(top, left, width, height) {
             wall.style.height = height + "px";
             document.getElementById("game").appendChild(wall);
 
-            // Add wall to global collision array
             window.walls.push(wall);
         }
     });
 }
 
-// Create walls with one exit on right wall middle
-createWallButton(50, 50, 600, 10);     // top wall
-createWallButton(440, 50, 600, 10);    // bottom wall
-createWallButton(50, 50, 10, 400);     // left wall
-createWallButton(50, 640, 10, 150);    // right wall top
-createWallButton(300, 640, 10, 150);   // right wall bottom (middle exit)
+// Walls with one exit
+createWallButton(50, 50, 600, 10);     // top
+createWallButton(440, 50, 600, 10);    // bottom
+createWallButton(50, 50, 10, 400);     // left
+createWallButton(50, 640, 10, 150);    // right top
+createWallButton(300, 640, 10, 150);   // right bottom
 
-// Initialize stats
 updateUI();

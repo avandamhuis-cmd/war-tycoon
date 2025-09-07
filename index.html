@@ -76,6 +76,9 @@
     let speed = 5;
     let keys = {};
 
+    // Initialize numeric position
+    let playerPos = { top: 200, left: 200 };
+
     // Load save from localStorage
     if(localStorage.getItem("ww2Save")){
       let save = JSON.parse(localStorage.getItem("ww2Save"));
@@ -83,7 +86,6 @@
       soldiers = save.soldiers || 0;
       tanks = save.tanks || 0;
       planes = save.planes || 0;
-      updateUI();
     }
 
     // Movement controls
@@ -91,13 +93,19 @@
     document.addEventListener("keyup", e => keys[e.key] = false);
 
     function gameLoop(){
-      let top = parseInt(player.style.top);
-      let left = parseInt(player.style.left);
+      // Update position
+      if(keys["ArrowUp"] || keys["w"]) playerPos.top -= speed;
+      if(keys["ArrowDown"] || keys["s"]) playerPos.top += speed;
+      if(keys["ArrowLeft"] || keys["a"]) playerPos.left -= speed;
+      if(keys["ArrowRight"] || keys["d"]) playerPos.left += speed;
 
-      if(keys["ArrowUp"] || keys["w"]) player.style.top = (top - speed) + "px";
-      if(keys["ArrowDown"] || keys["s"]) player.style.top = (top + speed) + "px";
-      if(keys["ArrowLeft"] || keys["a"]) player.style.left = (left - speed) + "px";
-      if(keys["ArrowRight"] || keys["d"]) player.style.left = (left + speed) + "px";
+      // Clamp inside game area
+      playerPos.top = Math.max(0, Math.min(window.innerHeight - 40, playerPos.top));
+      playerPos.left = Math.max(0, Math.min(window.innerWidth - 40, playerPos.left));
+
+      // Apply position to DOM
+      player.style.top = playerPos.top + "px";
+      player.style.left = playerPos.left + "px";
 
       checkCollision();
       requestAnimationFrame(gameLoop);
